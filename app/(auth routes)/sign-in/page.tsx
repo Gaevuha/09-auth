@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { login, LoginRequest } from '@/lib/api/clientApi';
-import css from './SignInPage.module.css';
-import { AxiosError } from 'axios';
 import { useAuthStore } from '@/lib/store/authStore';
+import { AxiosError } from 'axios';
+import css from './SignInPage.module.css';
+import { login, LoginRequest } from '@/lib/api/clientApi';
 
 export default function SignIn() {
   const router = useRouter();
@@ -14,19 +14,18 @@ export default function SignIn() {
 
   const handleLogin = async (formData: FormData) => {
     setError('');
-
-    const data = {
+    const data: LoginRequest = {
       email: formData.get('email') as string,
       password: formData.get('password') as string,
-    } as LoginRequest;
+    };
 
     try {
-      const user = await login(data); // повертає User
+      const user = await login(data);
       setUser(user);
-      router.push('/profile');
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      setError(err.response?.data?.message || 'Login failed');
+      router.replace('/profile');
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      setError(error.response?.data?.message || 'Login failed');
     }
   };
 
@@ -39,8 +38,8 @@ export default function SignIn() {
           <label htmlFor="email">Email</label>
           <input
             id="email"
-            type="email"
             name="email"
+            type="email"
             className={css.input}
             required
           />
@@ -50,8 +49,8 @@ export default function SignIn() {
           <label htmlFor="password">Password</label>
           <input
             id="password"
-            type="password"
             name="password"
+            type="password"
             className={css.input}
             required
           />

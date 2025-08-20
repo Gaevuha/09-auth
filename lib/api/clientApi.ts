@@ -20,7 +20,6 @@ export interface LoginRequest {
   password: string;
 }
 
-// Клієнтські запити йдуть через проксі на серверний Route
 export async function fetchNotesClient(
   query = '',
   page = 1,
@@ -63,3 +62,13 @@ export async function login(data: LoginRequest): Promise<User> {
   });
   return res.data;
 }
+
+export const checkSession = async (): Promise<User | null> => {
+  try {
+    const response = await api.get<User>('/auth/session'); // проксі Next.js
+    return response.data;
+  } catch (error) {
+    console.error('Session check failed:', error);
+    return null;
+  }
+};
