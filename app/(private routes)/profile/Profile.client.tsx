@@ -15,7 +15,6 @@ interface ProfileClientProps {
 export default function ProfileClient({ initialUser }: ProfileClientProps) {
   const { user, setUser } = useAuthStore();
 
-  // Підставляємо серверний user в Zustand при першому рендері
   useEffect(() => {
     if (initialUser) setUser(initialUser);
   }, [initialUser, setUser]);

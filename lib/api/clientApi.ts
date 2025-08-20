@@ -20,6 +20,11 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface UpdateProfileData {
+  username?: string;
+  email?: string;
+}
+
 export async function fetchNotesClient(
   query = '',
   page = 1,
@@ -71,4 +76,13 @@ export const checkSession = async (): Promise<User | null> => {
     console.error('Session check failed:', error);
     return null;
   }
+};
+
+export const updateUserProfile = async (
+  data: UpdateProfileData,
+): Promise<User> => {
+  const res = await api.patch<User>('/users/me', data, {
+    withCredentials: true,
+  });
+  return res.data;
 };
