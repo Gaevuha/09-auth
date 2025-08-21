@@ -41,7 +41,7 @@ export default function ProfileClient({ initialUser }: ProfileClientProps) {
 
         <div className={css.avatarWrapper}>
           <Image
-            src="/Avatar.jpg"
+            src={currentUser.avatar || '/Avatar.jpg'}
             alt="User Avatar"
             width={120}
             height={120}

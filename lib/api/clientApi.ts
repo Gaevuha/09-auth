@@ -68,21 +68,24 @@ export async function login(data: LoginRequest): Promise<User> {
   return res.data;
 }
 
-export const checkSession = async (): Promise<User | null> => {
+export const checkSessionClient = async (): Promise<boolean> => {
   try {
-    const response = await api.get<User>('/auth/session'); // проксі Next.js
-    return response.data;
+    const res = await api.get('/auth/session', { withCredentials: true });
+    return res.status === 200;
   } catch (error) {
-    console.error('Session check failed:', error);
-    return null;
+    console.error('Session check failed (client):', error);
+    return false;
   }
 };
 
-export const updateUserProfile = async (
-  data: UpdateProfileData,
-): Promise<User> => {
+export async function getUser(): Promise<User> {
+  const res = await api.get<User>('/users/me', { withCredentials: true });
+  return res.data;
+}
+
+export async function updateUserProfile(data: Partial<User>): Promise<User> {
   const res = await api.patch<User>('/users/me', data, {
     withCredentials: true,
   });
   return res.data;
-};
+}

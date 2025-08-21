@@ -1,24 +1,21 @@
 // lib/api/serverApi.ts
 import api from './api';
 import type { Note, NewNoteData } from '@/types/note';
-import { cookies } from 'next/headers';
 import type { User } from '@/types/user';
+import { cookies } from 'next/headers';
 
 export interface FetchNotesResponse {
   notes: Note[];
   totalPages: number;
 }
 
-// Отримати cookies з поточного запиту
-
 export async function getAuthHeaders() {
-  const cookieStore = await cookies(); // обов’язково await
+  const cookieStore = await cookies();
   const cookieArray = Array.from(cookieStore.getAll());
   const cookieString = cookieArray.map(c => `${c.name}=${c.value}`).join('; ');
   return { Cookie: cookieString };
 }
 
-// Серверні функції
 export async function fetchNotesServer(
   query = '',
   page = 1,
@@ -54,19 +51,23 @@ export async function deleteNoteServer(id: string): Promise<Note> {
 
 export async function fetchProfileServer(): Promise<User | null> {
   try {
-    const cookieStore = await cookies();
-    const cookieArray = cookieStore.getAll();
-    const cookieString = cookieArray
-      .map(c => `${c.name}=${c.value}`)
-      .join('; ');
-
-    const res = await api.get<User>('/users/me', {
-      headers: { Cookie: cookieString },
-    });
-
+    const headers = await getAuthHeaders();
+    const res = await api.get<User>('/users/me', { headers });
     return res.data;
   } catch (err) {
-    console.error(err);
+    console.error('Fetch profile failed (server):', err);
     return null;
   }
 }
+
+export const checkSessionServer = async (): Promise<boolean> => {
+  try {
+    const headers = await getAuthHeaders();
+    if (!headers.Cookie) return false;
+    const res = await api.get('/auth/session', { headers });
+    return res.status === 200;
+  } catch (error) {
+    console.error('Session check failed (server):', error);
+    return false;
+  }
+};

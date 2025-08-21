@@ -49,7 +49,7 @@ export default function EditProfilePage() {
 
         <div className={css.avatarWrapper}>
           <Image
-            src={user.photoUrl || '/Avatar.jpg'}
+            src={user.avatar || '/Avatar.jpg'}
             alt="User Avatar"
             width={120}
             height={120}

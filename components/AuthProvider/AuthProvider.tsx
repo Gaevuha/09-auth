@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import { useAuthStore } from '@/lib/store/authStore';
-import { checkSession } from '@/lib/api/clientApi';
+import { checkSessionClient, getUser } from '@/lib/api/clientApi';
 import Loader from '@/app/loading';
 
 interface AuthProviderProps {
@@ -10,16 +10,26 @@ interface AuthProviderProps {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const { setUser, isAuthenticated, clearIsAuthenticated } = useAuthStore();
+  const { setUser, clearIsAuthenticated } = useAuthStore();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     const verify = async () => {
       try {
-        const user = await checkSession();
-        if (user) setUser(user);
-        else clearIsAuthenticated();
-      } catch {
+        const sessionValid = await checkSessionClient();
+
+        if (sessionValid) {
+          const user = await getUser();
+          if (user) {
+            setUser(user);
+          } else {
+            clearIsAuthenticated();
+          }
+        } else {
+          clearIsAuthenticated();
+        }
+      } catch (error) {
+        console.error('AuthProvider verification error:', error);
         clearIsAuthenticated();
       } finally {
         setChecking(false);
@@ -29,7 +39,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   }, [setUser, clearIsAuthenticated]);
 
   if (checking) return <Loader />;
-  if (!isAuthenticated) return null;
 
   return <>{children}</>;
 }
